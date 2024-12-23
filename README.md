@@ -2,7 +2,7 @@
 
 ## 一、概述
 
-EasyGmSSL  FORK 自开源软件 [GmSSL](https://github.com/guanzhi/GmSSL)，EasyGmSSL旨在为开发者提供一套接口更加友好的国密算法应用开发工具。它涵盖了SM2、SM3、SM4等国密算法的核心功能，并针对实际使用场景中的痛点进行了针对性改进。
+EasyGmSSL  FORK 自<u>**北京大学 GUNAZHI 老师团队的开源国密算法库**</u>： [GmSSL](https://github.com/guanzhi/GmSSL)，EasyGmSSL旨在为开发者提供一套接口更加友好的国密算法应用开发工具。它涵盖了SM2、SM3、SM4等国密算法的核心功能，并针对实际使用场景中的痛点进行了针对性改进。
 
 ## 二、特色功能
 
@@ -27,10 +27,10 @@ EasyGmSSL  FORK 自开源软件 [GmSSL](https://github.com/guanzhi/GmSSL)，Easy
 只需在命令行中执行以下pip命令即可完成安装：
 
 ```bash
-pip install [sdk名称]
+pip install easy_gmssl
 ```
 
-安装过程中，系统会自动处理底层C库的编译与安装事宜，您只需耐心等待片刻，待安装完成后即可开启国密算法开发之旅。
+安装过程中，系统会自动处理底层C库的编译与安装事宜，待编译安装完成后即可开启国密算法开发之旅。
 
 ## 四、使用示例
 
@@ -40,6 +40,9 @@ pip install [sdk名称]
        enc = EasySm2EncryptionKey()
        enc.load_sm2_private_key('./test_keys/tmp_test_sm2_private.pem', '123456')
        plain = 'hello,world'
+       # 遍历当前支持的所有 SM2 加解密算法模式
+       # 当前支持的模式包括：
+       # C1C3C2_ASN1、C1C3C2、C1C2C3_ASN1、C1C2C3
        for mode in SM2CipherMode:
            print(mode, '密文 in Hex:', enc.Encrypt('hello,world'.encode('utf-8'), mode, SM2CipherFormat.HexStr))
    
@@ -47,16 +50,18 @@ pip install [sdk名称]
 2. **SM2公钥、私钥读取**
    ```python
    enc = EasySm2EncryptionKey()
+   # 可直接读取公私钥的十六进制数据，方便进行算法调试
    print('随机生成的公钥数据:', enc.get_sm2_public_key_in_hex())
    print('随机生成的私钥数据:', enc.get_sm2_private_key_in_hex())
    print('公钥 XY 坐标:', enc.get_point_in_hex())
    ```
 3. **SM2签名验签**
-    - 以RS_ASN1模式为例：
+    
+   - 以RS_ASN1模式为例：
    ```python
    signer_id = 'test_signer'
    print('signer_id hex:', signer_id.encode('utf-8').hex())
-   # 初始化用于签名验签的 SM2 密钥
+   # 初始化用于签名验签的 SM2 密钥，此时不需要关心签名值的模式
    test = EasySM2SignKey(signer_id = signer_id, pem_private_key_file = './test_keys/tmp_test_sm2_private.pem',
                              password = '123456')
    plain = bytes([random.randint(0, 255) for _ in range(0, 64)])
@@ -66,7 +71,7 @@ pip install [sdk名称]
    
    # 计算签名
    test.UpdateData(plain)
-   # 知情签名值模式为 RS 模式，可选 RS、RS_ASN1
+   # 指定签名值模式为 RS 模式，可选 RS、RS_ASN1
    sign_value = test.GetSignValue(signature_mode = SignatureMode.RS)
    print('signature hex:', sign_value.hex())
    
@@ -78,6 +83,113 @@ pip install [sdk名称]
    ret = verify_test.VerifySignature(sign_value, signature_mode = SignatureMode.RS)
    
    ```
+
+4.   **SM4-CBC对称加解密**
+
+     ```python
+     key = 'x' * SM4_BLOCK_SIZE
+     iv = 'y' * SM4_CBC_IV_SIZE
+     # 加密操作
+     test_cbc_enc = EasySm4CBC(key.encode('utf-8'), iv.encode('utf-8'), True)
+     plain1 = 'hello,world'
+     plain2 = '1234567890'
+     cipher1 = test_cbc_enc.Update(plain1.encode('utf-8'))
+     cipher2 = test_cbc_enc.Update(plain2.encode('utf-8'))
+     ciphers = cipher1 + cipher2 + test_cbc_enc.Finish()
+     
+     # 解密操作
+     test_dec = EasySm4CBC(key.encode('utf-8'), iv.encode('utf-8'), False)
+     decrypted_plain1 = test_dec.Update(ciphers)
+     decrypted_plain = decrypted_plain1 + test_dec.Finish()
+     ```
+
+5.   **SM4-GCM对称加解密**
+
+     ```python
+     key = 'x' * SM4_BLOCK_SIZE
+     iv = 'y' * SM4_CBC_IV_SIZE
+     # 定义拓展验证数据，加解密时此数据需要保持一致
+     aad = 'a' * (SM4_BLOCK_SIZE + SM4_CBC_IV_SIZE)
+     # 定义tag长度，最小 8 个字节
+     tag_len = int(SM4_GCM_DEFAULT_TAG_SIZE / 2)
+     test_gcm_enc = EasySm4GCM(key.encode('utf-8'), iv.encode('utf-8'), aad, tag_len, True)
+     plain1 = 'hello,world'
+     plain2 = '1234567890'
+     # 进行加密操作
+     cipher1 = test_gcm_enc.Update(plain1.encode('utf-8'))
+     cipher2 = test_gcm_enc.Update(plain2.encode('utf-8'))
+     ciphers = cipher1 + cipher2 + test_gcm_enc.Finish()
+     # GCM模式下的密文长度与明文长度等长
+     # 返回的密文中包含了 tag 长度
+     print('ciphers len:', len(ciphers), 'tag_len=', tag_len, 'plain len:', len(plain1 + plain2))
+     
+     # 进行解密操作，此时aad和tag_len需要与加密时保持一致
+     test_dec = EasySm4GCM(key.encode('utf-8'), iv.encode('utf-8'), aad, tag_len, False)
+     decrypted_plain1 = test_dec.Update(ciphers)
+     decrypted_plain = decrypted_plain1 + test_dec.Finish()
+     ```
+
+6.   **SM3哈希与HMAC计算**
+
+     ```python
+     # 计算哈希
+     plain1 = 'hello,world'.encode('utf-8')
+     plain2 = '1234567890'.encode('utf-8')
+     plain3 = (plain1 + plain2)
+     print('plain hex:', plain3.hex())
+     test.UpdateData(plain3)
+     hash_value_2, hash_len, length2 = test.GetHash()
+     print('hash value:', hash_value_2.hex())
+     print('hash value length in bytes:', hash_len)
+     
+     # 计算HMAC
+     plain = 'hello,world'.encode('utf-8')
+     print('plain hex:', plain.hex())
+     key = bytes([random.randint(0, 255) for _ in range(0, SM3_HMAC_MAX_KEY_SIZE)])
+     print('key hex:', key.hex())
+     test = EasySM3Hmac(key)
+     test.UpdateData(plain)
+     hmac_hex, hmac_len, plain_len = test.GetHmac()
+     print('hmac value:', hmac_hex.hex(), 'hmac len:', hmac_len, 'plain len:', plain_len)
+     ```
+
+7.   **随机字节流与随机字符串**
+
+     ```python
+     # 生成随机字节流
+     test = EasyRandomData()
+     ret = test.GetRandomData(20)
+     print(ret.hex())
+     # 生成随机字符串
+     test = EasyRandomData(mode = RandomMode.RandomStr)
+     ret = test.GetRandomData(64)
+     print(ret)
+     ```
+
+8.   **ZUC加解密**
+
+     ```python
+     # 生成密钥与 IV
+     key = EasyRandomData().GetRandomData(ZUC_KEY_SIZE)
+     iv = EasyRandomData().GetRandomData(ZUC_IV_SIZE)
+     # 加密操作
+     test = EasyZuc(key, iv)
+     plain1 = 'hello,world'.encode('utf-8')
+     cipher1 = test.Update(plain1)
+     plain2 = '1234567890'.encode('utf-8')
+     cipher2 = test.Update(plain2)
+     cipher3 = test.Finish()
+     
+     # 解密操作
+     test2 = EasyZuc(key, iv)
+     ret1 = test2.Update(cipher1)
+     ret2 = test2.Update(cipher2)
+     ret3 = test2.Update(cipher3)
+     ret4 = test2.Finish()
+     assert ret1 + ret2 + ret3 + ret4 == plain1 + plain2
+     ```
+
+     
 
 ## 五、注意事项
 
