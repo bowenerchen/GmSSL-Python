@@ -469,7 +469,12 @@ class EasySm2Key(object):
             return {'X': self._point_x, 'Y': self._point_y}
         return {'X': '', 'Y': ''}
 
-    def encrypt(self, plain_data: bytes,
+
+class EasySm2EncryptionKey(EasySm2Key):
+    def __init__(self):
+        super().__init__()
+
+    def Encrypt(self, plain_data: bytes,
                 cipher_mode: Literal[
                     SM2CipherMode.C1C3C2_ASN1,
                     SM2CipherMode.C1C3C2,
@@ -491,7 +496,7 @@ class EasySm2Key(object):
         else:
             raise ValueError('empty sm2 public key')
 
-    def decrypt(self, cipher_data: bytes,
+    def Decrypt(self, cipher_data: bytes,
                 cipher_mode: Literal[
                     SM2CipherMode.C1C3C2_ASN1,
                     SM2CipherMode.C1C3C2,
@@ -519,7 +524,7 @@ class EasySm2Key(object):
 
 
 if __name__ == '__main__':
-    enc = EasySm2Key()
+    enc = EasySm2EncryptionKey()
     enc.load_sm2_private_key('./test_keys/tmp_test_sm2_private.pem', '123456')
     plain = 'hello,world'
     print('明文:', plain.encode('utf-8').hex())
@@ -528,7 +533,7 @@ if __name__ == '__main__':
     print('公钥 XY 坐标:', enc.get_point_in_hex())
     print('-' * 32)
     for mode in SM2CipherMode:
-        print(mode, '密文 in Hex:', enc.encrypt('hello,world'.encode('utf-8'), mode, SM2CipherFormat.HexStr))
+        print(mode, '密文 in Hex:', enc.Encrypt('hello,world'.encode('utf-8'), mode, SM2CipherFormat.HexStr))
 
     print('-' * 32)
 

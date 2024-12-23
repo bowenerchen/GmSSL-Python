@@ -3,7 +3,7 @@ import random
 import unittest
 
 from Core.gmssl import SM2_MAX_CIPHERTEXT_SIZE, SM2_MAX_PLAINTEXT_SIZE
-from easy_sm2_key import EasySm2Key, SM2CipherFormat, SM2CipherMode
+from easy_sm2_key import EasySm2EncryptionKey, EasySm2Key, SM2CipherFormat, SM2CipherMode
 
 
 class SM2KeyCase(unittest.TestCase):
@@ -94,18 +94,18 @@ class SM2KeyCase(unittest.TestCase):
             self.assertTrue(False)
 
     def test_valid_encrypt_decrypt(self):
-        test = EasySm2Key()
+        test = EasySm2EncryptionKey()
         plain_valid = bytes([random.randint(1, 255) for _ in range(0, SM2_MAX_PLAINTEXT_SIZE)])
         for mode in SM2CipherMode:
-            cipher = test.encrypt(plain_data = plain_valid, cipher_mode = mode, cipher_format = SM2CipherFormat.Base64Str)
-            decrypted_plain = test.decrypt(cipher_data = base64.b64decode(cipher), cipher_mode = mode)
+            cipher = test.Encrypt(plain_data = plain_valid, cipher_mode = mode, cipher_format = SM2CipherFormat.Base64Str)
+            decrypted_plain = test.Decrypt(cipher_data = base64.b64decode(cipher), cipher_mode = mode)
             self.assertTrue(decrypted_plain == plain_valid)
 
     def test_encrypt_too_long_plain(self):
-        test = EasySm2Key()
+        test = EasySm2EncryptionKey()
         plain_valid = bytes([random.randint(1, 255) for _ in range(0, SM2_MAX_PLAINTEXT_SIZE + 1)])
         try:
-            test.encrypt(plain_data = plain_valid)
+            test.Encrypt(plain_data = plain_valid)
         except Exception as e:
             self.assertTrue(True)
             print(e)
@@ -113,10 +113,10 @@ class SM2KeyCase(unittest.TestCase):
             self.assertTrue(False)
 
     def test_decrypt_too_long_cipher(self):
-        test = EasySm2Key()
+        test = EasySm2EncryptionKey()
         cipher_invalid = bytes([random.randint(1, 255) for _ in range(0, SM2_MAX_CIPHERTEXT_SIZE + 1)])
         try:
-            test.decrypt(cipher_data = cipher_invalid)
+            test.Decrypt(cipher_data = cipher_invalid)
         except Exception as e:
             self.assertTrue(True)
             print(e)
@@ -124,10 +124,10 @@ class SM2KeyCase(unittest.TestCase):
             self.assertTrue(False)
 
     def test_invalid_cipher_mode(self):
-        test = EasySm2Key()
+        test = EasySm2EncryptionKey()
         plain_valid = bytes([random.randint(1, 255) for _ in range(0, SM2_MAX_PLAINTEXT_SIZE)])
         try:
-            test.encrypt(plain_data = plain_valid, cipher_mode = 'abc')
+            test.Encrypt(plain_data = plain_valid, cipher_mode = 'abc')
         except Exception as e:
             self.assertTrue(True)
             print(e)
@@ -135,10 +135,10 @@ class SM2KeyCase(unittest.TestCase):
             self.assertTrue(False)
 
     def test_invalid_cipher_format(self):
-        test = EasySm2Key()
+        test = EasySm2EncryptionKey()
         plain_valid = bytes([random.randint(1, 255) for _ in range(0, SM2_MAX_PLAINTEXT_SIZE)])
         try:
-            test.encrypt(plain_data = plain_valid, cipher_format = 'abc')
+            test.Encrypt(plain_data = plain_valid, cipher_format = 'abc')
         except Exception as e:
             self.assertTrue(True)
             print(e)
@@ -146,11 +146,11 @@ class SM2KeyCase(unittest.TestCase):
             self.assertTrue(False)
 
     def test_has_no_private_key(self):
-        test = EasySm2Key()
+        test = EasySm2EncryptionKey()
         test.load_sm2_pub_key('./test_keys/tmp_test_sm2_public.pem')
         cipher_invalid = bytes([random.randint(1, 255) for _ in range(0, SM2_MAX_CIPHERTEXT_SIZE)])
         try:
-            test.decrypt(cipher_data = cipher_invalid)
+            test.Decrypt(cipher_data = cipher_invalid)
         except Exception as e:
             self.assertTrue(True)
             print(e)
