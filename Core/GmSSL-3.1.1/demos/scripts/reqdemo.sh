@@ -25,7 +25,6 @@ gmssl reqgen -O "北京大学" -CN "爱丽丝" -key alicekey.pem -pass 1234 -out
 gmssl reqsign -in alicereq.pem -days 365 -key_usage digitalSignature -cacert cacert.pem -key cakey.pem -pass 1234 -out alicecert.pem
 gmssl certparse -in alicecert.pem
 
-
 rm -fr pubkey.pem
 rm -fr cacert.pem
 rm -fr signkey.pem

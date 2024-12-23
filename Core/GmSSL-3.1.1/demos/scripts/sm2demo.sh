@@ -7,4 +7,3 @@ echo hello | gmssl sm2verify -pubkey sm2pub.pem -sig sm2.sig -id 123456781234567
 
 echo hello | gmssl sm2encrypt -pubkey sm2pub.pem -out sm2.der
 gmssl sm2decrypt -key sm2.pem -pass 1234 -in sm2.der
-

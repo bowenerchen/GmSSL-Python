@@ -1,6 +1,5 @@
 #!/bin/bash -x
 
-
 gmssl sm2keygen -pass 1234 -out rootcakey.pem
 gmssl certgen -C CN -ST Beijing -L Haidian -O PKU -OU CS -CN ROOTCA -days 3650 -key rootcakey.pem -pass 1234 -out rootcacert.pem -key_usage keyCertSign -key_usage cRLSign -ca
 gmssl certparse -in rootcacert.pem
@@ -20,11 +19,11 @@ gmssl reqgen -C CN -ST Beijing -L Haidian -O PKU -OU CS -CN localhost -key encke
 gmssl reqsign -in encreq.pem -days 365 -key_usage keyEncipherment -cacert cacert.pem -key cakey.pem -pass 1234 -out enccert.pem
 gmssl certparse -in enccert.pem
 
-cat signcert.pem > double_certs.pem
-cat enccert.pem >> double_certs.pem
-cat cacert.pem >> double_certs.pem
+cat signcert.pem >double_certs.pem
+cat enccert.pem >>double_certs.pem
+cat cacert.pem >>double_certs.pem
 
-sudo gmssl tlcp_server -port 443 -cert double_certs.pem -key signkey.pem -pass 1234 -ex_key enckey.pem -ex_pass 1234 -cacert cacert.pem  1>/dev/null  2>/dev/null &
+sudo gmssl tlcp_server -port 443 -cert double_certs.pem -key signkey.pem -pass 1234 -ex_key enckey.pem -ex_pass 1234 -cacert cacert.pem 1>/dev/null 2>/dev/null &
 #sudo gmssl tlcp_server -port 443 -cert double_certs.pem -key signkey.pem -pass 1234 -ex_key enckey.pem -ex_pass 1234  1>/dev/null  2>/dev/null &
 sleep 3
 
@@ -42,8 +41,6 @@ gmssl certparse -in clientcert.pem
 
 openssl version
 
-../../build/bin/demo_sm2_key_export clientkey.pem 1234 > clientpkey.pem
+../../build/bin/demo_sm2_key_export clientkey.pem 1234 >clientpkey.pem
 
 #openssl s_client -enable_ntls -ntls -connect localhost:443 -no_ticket -CAfile rootcacert.pem -sign_cert clientcert.pem -sign_key clientpkey.pem -pass pass:1234
-
-

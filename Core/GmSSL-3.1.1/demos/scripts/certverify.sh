@@ -8,8 +8,7 @@ crl=CFCA_SM2_OCA1.crl
 cacert=CFCA_SM2_OCA1.pem
 rootcacert=CFCA_CS_SM2_CA.pem
 
-
-cat << EOF > $signcert
+cat <<EOF >$signcert
 -----BEGIN CERTIFICATE-----
 MIICzzCCAnKgAwIBAgIFEzY5M3AwDAYIKoEcz1UBg3UFADAlMQswCQYDVQQGEwJD
 TjEWMBQGA1UECgwNQ0ZDQSBTTTIgT0NBMTAeFw0yMTA2MTEwOTA1MjBaFw0yNjA2
@@ -30,7 +29,7 @@ cnUN
 -----END CERTIFICATE-----
 EOF
 
-cat << EOF > $enccert
+cat <<EOF >$enccert
 -----BEGIN CERTIFICATE-----
 MIICzjCCAnKgAwIBAgIFEzY5M3EwDAYIKoEcz1UBg3UFADAlMQswCQYDVQQGEwJD
 TjEWMBQGA1UECgwNQ0ZDQSBTTTIgT0NBMTAeFw0yMTA2MTEwOTA1MjBaFw0yNjA2
@@ -51,8 +50,7 @@ Ur8=
 -----END CERTIFICATE-----
 EOF
 
-
-cat << EOF > $cacert
+cat <<EOF >$cacert
 -----BEGIN CERTIFICATE-----
 MIICNTCCAdmgAwIBAgIFEAAAAAgwDAYIKoEcz1UBg3UFADBYMQswCQYDVQQGEwJD
 TjEwMC4GA1UECgwnQ2hpbmEgRmluYW5jaWFsIENlcnRpZmljYXRpb24gQXV0aG9y
@@ -69,8 +67,7 @@ Pr6yYTLzAiEAiyqrqsGUU5vGkDo5bEpmF1EbnY8xovsM9vCx98yBrVM=
 -----END CERTIFICATE-----
 EOF
 
-
-cat << EOF > $rootcacert
+cat <<EOF >$rootcacert
 -----BEGIN CERTIFICATE-----
 MIICAzCCAaegAwIBAgIEFy9CWTAMBggqgRzPVQGDdQUAMFgxCzAJBgNVBAYTAkNO
 MTAwLgYDVQQKDCdDaGluYSBGaW5hbmNpYWwgQ2VydGlmaWNhdGlvbiBBdXRob3Jp
@@ -91,23 +88,23 @@ gmssl certverify -in $enccert -cacert $cacert
 gmssl certverify -in $cacert -cacert $rootcacert
 
 chain=chain.pem
-cat $signcert > $chain
-cat $cacert >> $chain
+cat $signcert >$chain
+cat $cacert >>$chain
 gmssl certverify -in $chain -cacert $rootcacert
 
 chain_with_root=chain_with_root.pem
 cp $chain $chain_with_root
-cat $rootcacert >> $chain_with_root
+cat $rootcacert >>$chain_with_root
 gmssl certverify -in $chain_with_root -cacert $rootcacert
 
 double_certs=double_certs.pem
-cat $signcert > $double_certs
-cat $enccert >> $double_certs
+cat $signcert >$double_certs
+cat $enccert >>$double_certs
 gmssl certverify -in $double_certs -cacert $cacert -double_certs
 
 double_chain=double_chain.pem
-cat $double_certs > $double_chain
-cat $cacert >> $double_chain
+cat $double_certs >$double_chain
+cat $cacert >>$double_chain
 gmssl certverify -in $double_chain -cacert $rootcacert -double_certs
 
 gmssl certparse -in $double_chain
@@ -126,4 +123,3 @@ rm -fr $double_certs
 rm -fr $double_chain
 
 echo ok
-

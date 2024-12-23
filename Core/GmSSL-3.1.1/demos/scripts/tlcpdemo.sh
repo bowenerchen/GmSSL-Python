@@ -21,17 +21,18 @@ gmssl reqgen -C CN -ST Beijing -L Haidian -O PKU -OU CS -CN localhost -key encke
 gmssl reqsign -in encreq.pem -days 365 -key_usage keyEncipherment -cacert cacert.pem -key cakey.pem -pass 1234 -out enccert.pem
 gmssl certparse -in enccert.pem
 
-cat signcert.pem > double_certs.pem
-cat enccert.pem >> double_certs.pem
-cat cacert.pem >> double_certs.pem
+cat signcert.pem >double_certs.pem
+cat enccert.pem >>double_certs.pem
+cat cacert.pem >>double_certs.pem
 
 # If port is already in use, `gmssl` will fail, use `ps aux | grep gmssl` and `sudo kill -9` to kill existing proc
 # TODO: check if `gmssl` is failed
 which sudo
 if [ $? -eq 0 ]; then
-	SUDO=sudo
+  SUDO=sudo
 fi
-$SUDO gmssl tlcp_server -port 443 -cert double_certs.pem -key signkey.pem -pass 1234 -ex_key enckey.pem -ex_pass 1234 -cacert cacert.pem &  1>/dev/null  2>/dev/null &
+$SUDO gmssl tlcp_server -port 443 -cert double_certs.pem -key signkey.pem -pass 1234 -ex_key enckey.pem -ex_pass 1234 -cacert cacert.pem &
+1>/dev/null 2>/dev/null &
 sleep 3
 
 gmssl sm2keygen -pass 1234 -out clientkey.pem
@@ -40,4 +41,3 @@ gmssl reqsign -in clientreq.pem -days 365 -key_usage digitalSignature -cacert ca
 gmssl certparse -in clientcert.pem
 
 gmssl tlcp_client -host 127.0.0.1 -cacert rootcacert.pem -cert clientcert.pem -key clientkey.pem -pass 1234
-

@@ -1,6 +1,5 @@
 #!/bin/bash -x
 
-
 gmssl sm2keygen -pass 1234 -out rootcakey.pem
 gmssl certgen -C CN -ST Beijing -L Haidian -O PKU -OU CS -CN ROOTCA -days 3650 -key rootcakey.pem -pass 1234 -out rootcacert.pem -key_usage keyCertSign -key_usage cRLSign -ca
 gmssl certparse -in rootcacert.pem
@@ -15,14 +14,14 @@ gmssl reqgen -C CN -ST Beijing -L Haidian -O PKU -OU CS -CN localhost -key signk
 gmssl reqsign -in signreq.pem -days 365 -key_usage digitalSignature -cacert cacert.pem -key cakey.pem -pass 1234 -out signcert.pem
 gmssl certparse -in signcert.pem
 
-cat signcert.pem > certs.pem
-cat cacert.pem >> certs.pem
+cat signcert.pem >certs.pem
+cat cacert.pem >>certs.pem
 
 # If port is already in use, `gmssl` will fail, use `ps aux | grep gmssl` and `sudo kill -9` to kill existing proc
 # TODO: check if `gmssl` is failed
 which sudo
 if [ $? -eq 0 ]; then
-	SUDO=sudo
+  SUDO=sudo
 fi
 $SUDO gmssl tls12_server -port 4430 -cert certs.pem -key signkey.pem -pass 1234 -cacert cacert.pem & #1>/dev/null  2>/dev/null &
 sleep 3
@@ -33,4 +32,3 @@ gmssl reqsign -in clientreq.pem -days 365 -key_usage digitalSignature -cacert ca
 gmssl certparse -in clientcert.pem
 
 gmssl tls12_client -host 127.0.0.1 -port 4430 -cacert rootcacert.pem -cert clientcert.pem -key clientkey.pem -pass 1234
-

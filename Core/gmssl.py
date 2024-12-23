@@ -511,6 +511,10 @@ class Sm2Key(Structure):
             raise NativeError('libgmssl inner error')
         return outbuf[:outlen.value]
 
+    @property
+    def fields_(self):
+        return self._fields_
+
 
 DO_ENCRYPT = True
 DO_DECRYPT = False

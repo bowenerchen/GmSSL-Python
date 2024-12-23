@@ -1,6 +1,5 @@
 #!/bin/bash -x
 
-
 # https://ebssec.boc.cn
 gmssl tlcp_client -host 123.124.191.183
 

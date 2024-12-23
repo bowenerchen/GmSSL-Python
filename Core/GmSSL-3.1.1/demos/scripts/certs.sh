@@ -20,8 +20,8 @@ gmssl crlparse -in "crl/ROOTCA.crl"
 gmssl crlverify -in "crl/ROOTCA.crl" -cacert "rootca/ROOTCA.pem" # now > next_update
 
 # The CRL URI of ROOTCA.pem is in Base64 format, not DER
-gmssl certverify -in "ca/TJCA.pem" -cacert "rootca/Civil Servant ROOT.pem" #-check_crl
-gmssl certverify -in "ca/Taier CA.pem" -cacert "rootca/ROOTCA.pem" #-check_crl
+gmssl certverify -in "ca/TJCA.pem" -cacert "rootca/Civil Servant ROOT.pem"                         #-check_crl
+gmssl certverify -in "ca/Taier CA.pem" -cacert "rootca/ROOTCA.pem"                                 #-check_crl
 gmssl certverify -in "ca/Ant Financial Certification Authority S1.pem" -cacert "rootca/ROOTCA.pem" #-check_crl
 
 echo ok
