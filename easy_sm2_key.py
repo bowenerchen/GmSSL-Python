@@ -13,7 +13,7 @@ from typing import Dict, List, Literal, Tuple
 from pyasn1.codec.der import decoder, encoder
 from pyasn1.type import namedtype, univ
 
-from Core.gmssl import NativeError, SM2_MAX_PLAINTEXT_SIZE, Sm2Key
+from Core.gmssl import NativeError, SM2_MAX_CIPHERTEXT_SIZE, SM2_MAX_PLAINTEXT_SIZE, Sm2Key
 
 
 class SM2PubKeyASN1Sequence(univ.Sequence):
@@ -223,7 +223,7 @@ def __parse_sm2_c1c3c2_cipher_bytes__(raw_cipher: bytes) -> Tuple[bytes, bytes, 
     except Exception as e:
         raise ValueError('invalid sm2 cipher data:{}'.format(e))
     else:
-        return c1x_bytes, c1y_bytes, c2_bytes, c3_bytes
+        return c1x_bytes, c1y_bytes, c3_bytes, c2_bytes
 
 
 def __parse_sm2_c1c2c3_bytes__(raw_cipher: bytes) -> Tuple[bytes, bytes, bytes, bytes]:
@@ -273,12 +273,11 @@ def __encode_cipher__(target_mode: SM2CipherMode, cipher_c1c3c2: Tuple[bytes, by
             return bytes(ret)
         else:
             try:
-                if target_mode == SM2CipherMode.C1C3C2_ASN1:
+                if target_mode in [SM2CipherMode.C1C3C2_ASN1, SM2CipherMode.C1C2C3_ASN1]:
                     return __encode_sm2_cipher_to_asn1_sequence__(cipher_c1c3c2 = cipher_c1c3c2,
-                                                                  cipher_mode = SM2CipherMode.C1C3C2_ASN1)
-                elif target_mode == SM2CipherMode.C1C2C3_ASN1:
-                    return __encode_sm2_cipher_to_asn1_sequence__(cipher_c1c3c2 = cipher_c1c3c2,
-                                                                  cipher_mode = SM2CipherMode.C1C2C3_ASN1)
+                                                                  cipher_mode = target_mode)
+                else:
+                    raise TypeError('invalid cipher mode:{}'.format(target_mode))
             except Exception as e:
                 raise ValueError('encode cipher to asn1 mode:{} error:{}'.format(target_mode, e))
 
@@ -301,6 +300,32 @@ def __parse_and_repack_cipher__(cipher_mode: SM2CipherMode,
         return base64.b64encode(encoded_cipher_bytes).decode('utf-8')
     else:
         return encoded_cipher_bytes.hex()
+
+
+def __parse_raw_cipher_and_repack_to_c1c3c2_asn1__(cipher_mode: Literal[
+    SM2CipherMode.C1C3C2_ASN1,
+    SM2CipherMode.C1C3C2,
+    SM2CipherMode.C1C2C3_ASN1,
+    SM2CipherMode.C1C2C3],
+                                                   raw_cipher_bytes: bytes) -> bytes:
+    """
+    将不同模式下的密文数据统一转换为 C1C3C2_ASN1 模式的密文
+    """
+    try:
+        __check_raw_cipher_length__(raw_cipher_bytes)
+        c1_c3_c2_bytes = bytes()
+        if cipher_mode == SM2CipherMode.C1C3C2_ASN1:
+            return raw_cipher_bytes
+        elif cipher_mode == SM2CipherMode.C1C2C3_ASN1:
+            c1_c3_c2_bytes = __parse_sm2_asn1_cipher_bytes__(raw_cipher = raw_cipher_bytes, cipher_mode = cipher_mode)
+        elif cipher_mode == SM2CipherMode.C1C2C3:
+            c1_c3_c2_bytes = __parse_sm2_c1c2c3_bytes__(raw_cipher = raw_cipher_bytes)
+        elif cipher_mode == SM2CipherMode.C1C3C2:
+            c1_c3_c2_bytes = __parse_sm2_c1c3c2_cipher_bytes__(raw_cipher = raw_cipher_bytes)
+    except Exception as e:
+        raise ValueError('invalid cipher data:{}, cipher mode = {}'.format(e, cipher_mode))
+    else:
+        return __encode_cipher__(target_mode = SM2CipherMode.C1C3C2_ASN1, cipher_c1c3c2 = c1_c3_c2_bytes)
 
 
 class EasySm2Key(object):
@@ -449,10 +474,10 @@ class EasySm2Key(object):
                     SM2CipherMode.C1C3C2_ASN1,
                     SM2CipherMode.C1C3C2,
                     SM2CipherMode.C1C2C3_ASN1,
-                    SM2CipherMode.C1C2C3],
+                    SM2CipherMode.C1C2C3] = SM2CipherMode.C1C3C2_ASN1,
                 cipher_format: Literal[
                     SM2CipherFormat.Base64Str,
-                    SM2CipherFormat.HexStr]) -> str:
+                    SM2CipherFormat.HexStr] = SM2CipherFormat.Base64Str) -> str:
         if not isinstance(cipher_mode, SM2CipherMode):
             raise TypeError('invalid cipher mode: {}'.format(cipher_mode))
         if not isinstance(cipher_format, SM2CipherFormat):
@@ -466,6 +491,32 @@ class EasySm2Key(object):
         else:
             raise ValueError('empty sm2 public key')
 
+    def decrypt(self, cipher_data: bytes,
+                cipher_mode: Literal[
+                    SM2CipherMode.C1C3C2_ASN1,
+                    SM2CipherMode.C1C3C2,
+                    SM2CipherMode.C1C2C3_ASN1,
+                    SM2CipherMode.C1C2C3] = SM2CipherMode.C1C3C2_ASN1) -> bytes:
+        """
+        cipher_data: 密文数据
+        cipher_mode: 密文模式
+        返回明文的字节序列
+        """
+        if not isinstance(cipher_mode, SM2CipherMode):
+            raise TypeError('invalid cipher mode: {}'.format(cipher_mode))
+        if not self._sm2_raw_key.has_private_key():
+            raise TypeError('no private key included, can not decrypt')
+        if len(cipher_data) > SM2_MAX_CIPHERTEXT_SIZE:
+            raise ValueError('cipher data too long, the maximum limit for the cipher is {} bytes'.format(SM2_MAX_CIPHERTEXT_SIZE))
+        try:
+            to_be_decrypted_cipher = __parse_raw_cipher_and_repack_to_c1c3c2_asn1__(cipher_mode = cipher_mode,
+                                                                                    raw_cipher_bytes = cipher_data)
+            ret = bytes(self._sm2_raw_key.decrypt(to_be_decrypted_cipher))
+        except Exception as e:
+            raise ValueError('decrypt error:{}, cipher mode = {}'.format(e, cipher_mode))
+        else:
+            return ret
+
 
 if __name__ == '__main__':
     enc = EasySm2Key()
@@ -478,3 +529,25 @@ if __name__ == '__main__':
     print('-' * 32)
     for mode in SM2CipherMode:
         print(mode, '密文 in Hex:', enc.encrypt('hello,world'.encode('utf-8'), mode, SM2CipherFormat.HexStr))
+
+    print('-' * 32)
+
+    # c1c3c2_asn1_cipher_hex = "307302202DDE3E3B518AE79A0DA24792AACCAF277C70D2BF094A721402F988ABF34D8A2B022045FF327DDDECEDB4A239BF262539A435AC4B5A2CD40496921A15C44DE4FD8ED60420EDDF4218FE658B672FC09E3F86676702EC380AAA4A9495C26BDAB191826FB547040BC6CF28A8BF426DF50F5E4F"
+    # c1c2c3_asn1_cipher_hex = "3074022100AEC56299468A3F0915D07607D25CE80091953530962F60CB953269AA17D1CC370220775B350FFF2F5E6593DDF289D74EF180D272EE27F7EFC7BF7E77FF760B26A376040B603717A97A68C54DD12D33042034049DB7F277C2E78E9984E01BB5B1F8718CA1CB4ADFB5DB567604A65E877C4E"
+    # c1c3c2_cipher_hex = "D3E1C15A8DE95D7213C916DAD6E416764910DC219F9E2E59283D55C6F124DEA845948F16201DA56B4072D7A63E81DB50993133338B6571C2D4FC4A6DA25C17D956508371AB83490E140E6445CC2A2224CB576D2711B698D67BCA38004119C91AD6F505BAC893ACBAE5B8B7"
+    # c1c2c3_cipher_hex = "F7F93B18B51DEE2384EF6EF4E45F5802FD980C0B00131CBE8006E89BA66D8E1241855F38293970306C974D4DD929A3D059BB9082DD7AA68420630B24A61E92754A4307FB47B3FEB7CB15E7D1F94CF4F99F8378548ED73D0EDD86418D823ACDB58F1802B7C8BB03F99112F7"
+    #
+    # tmp_ciphers = {
+    #     SM2CipherMode.C1C3C2_ASN1: c1c3c2_asn1_cipher_hex,
+    #     SM2CipherMode.C1C2C3_ASN1: c1c2c3_asn1_cipher_hex,
+    #     SM2CipherMode.C1C2C3: c1c2c3_cipher_hex,
+    #     SM2CipherMode.C1C3C2: c1c3c2_cipher_hex,
+    # }
+    #
+    # for mode, cipher in tmp_ciphers.items():
+    #     try:
+    #         plain_hex = enc.decrypt(bytes.fromhex(cipher), mode).hex()
+    #     except Exception as e:
+    #         print('decrypt failed, mode={}'.format(mode))
+    #     else:
+    #         print('mode={}, decrypt success:{}, 明文 in Hex:{}'.format(mode, plain_hex == plain.encode('utf-8').hex(), plain_hex))
