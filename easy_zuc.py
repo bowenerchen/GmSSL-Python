@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from Core.gmssl import Zuc, ZUC_IV_SIZE, ZUC_KEY_SIZE
+from .gmssl import Zuc, ZUC_IV_SIZE, ZUC_KEY_SIZE
 
 
 class EasyZuc(object):

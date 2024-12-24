@@ -1,1 +1,0 @@
-/opt/homebrew/opt/llvm/bin/clang  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names -L/opt/homebrew/opt/util-linux/lib CMakeFiles/aeadtest.dir/tests/aeadtest.c.o -o bin/aeadtest  bin/libgmssl.a -ldl -framework Security 

@@ -13,7 +13,7 @@ from typing import Dict, List, Literal, Tuple
 from pyasn1.codec.der import decoder, encoder
 from pyasn1.type import namedtype, univ
 
-from Core.gmssl import NativeError, SM2_MAX_CIPHERTEXT_SIZE, SM2_MAX_PLAINTEXT_SIZE, Sm2Key
+from .gmssl import NativeError, SM2_MAX_CIPHERTEXT_SIZE, SM2_MAX_PLAINTEXT_SIZE, Sm2Key
 
 
 class SM2PubKeyASN1Sequence(univ.Sequence):

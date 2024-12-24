@@ -1,6 +1,6 @@
 import unittest
 
-from Core.gmssl import SM4_BLOCK_SIZE, SM4_CBC_IV_SIZE, SM4_GCM_DEFAULT_TAG_SIZE, Sm4Cbc
+from gmssl import SM4_BLOCK_SIZE, SM4_CBC_IV_SIZE, SM4_GCM_DEFAULT_TAG_SIZE, Sm4Cbc
 from easy_sm4_key import EasySm4CBC, EasySm4GCM
 
 

@@ -1,1 +1,0 @@
-/opt/homebrew/opt/llvm/bin/clang  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk -dynamiclib -Wl,-headerpad_max_install_names -L/opt/homebrew/opt/util-linux/lib -compatibility_version 3.0.0 -current_version 3.1.0 -o bin/libskf_dummy.3.1.dylib -install_name @rpath/libskf_dummy.3.dylib CMakeFiles/skf_dummy.dir/src/skf/skf_dummy.c.o 

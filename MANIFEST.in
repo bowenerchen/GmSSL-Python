@@ -1,0 +1,3 @@
+include README.md
+include *.py
+recursive-include easy_gmssl/ *

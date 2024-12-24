@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from enum import Enum
 
-from Core.gmssl import SM4_BLOCK_SIZE, SM4_CBC_IV_SIZE, SM4_GCM_DEFAULT_TAG_SIZE, Sm4Cbc, Sm4Gcm
+from .gmssl import SM4_BLOCK_SIZE, SM4_CBC_IV_SIZE, SM4_GCM_DEFAULT_TAG_SIZE, Sm4Cbc, Sm4Gcm
 
 
 class EncryptionMode(Enum):

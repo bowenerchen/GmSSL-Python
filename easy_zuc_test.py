@@ -1,6 +1,6 @@
 import unittest
 
-from Core.gmssl import ZUC_IV_SIZE, ZUC_KEY_SIZE
+from gmssl import ZUC_IV_SIZE, ZUC_KEY_SIZE
 from easy_random_data import EasyRandomData
 from easy_zuc import EasyZuc
 

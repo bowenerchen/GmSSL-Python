@@ -1,1 +1,0 @@
-/opt/homebrew/opt/llvm/bin/clang  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names -L/opt/homebrew/opt/util-linux/lib CMakeFiles/demo_sm3_kdf.dir/demos/src/demo_sm3_kdf.c.o -o bin/demo_sm3_kdf  bin/libgmssl.a -ldl -framework Security 

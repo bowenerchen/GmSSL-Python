@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from typing import Tuple
 
-from Core.gmssl import Sm3, SM3_DIGEST_SIZE, SM3_HMAC_MAX_KEY_SIZE, SM3_HMAC_MIN_KEY_SIZE, SM3_HMAC_SIZE, Sm3Hmac
+from .gmssl import Sm3, SM3_DIGEST_SIZE, SM3_HMAC_MAX_KEY_SIZE, SM3_HMAC_MIN_KEY_SIZE, SM3_HMAC_SIZE, Sm3Hmac
 
 
 class EasySM3Digest(object):

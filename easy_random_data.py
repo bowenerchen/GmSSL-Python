@@ -9,7 +9,7 @@ import string
 from enum import Enum
 from typing import Union
 
-from Core import gmssl
+import gmssl
 
 
 class RandomMode(Enum):

@@ -1,7 +1,7 @@
 import random
 import unittest
 
-from Core.gmssl import SM2_MAX_SIGNATURE_SIZE
+from gmssl import SM2_MAX_SIGNATURE_SIZE
 from easy_sm2_sign_key import EasySM2SignKey, EasySM2VerifyKey, SignatureMode
 
 

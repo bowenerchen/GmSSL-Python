@@ -1,1 +1,0 @@
-/opt/homebrew/opt/llvm/bin/clang  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names -L/opt/homebrew/opt/util-linux/lib CMakeFiles/x509_algtest.dir/tests/x509_algtest.c.o -o bin/x509_algtest  bin/libgmssl.a -ldl -framework Security 

@@ -10,8 +10,8 @@ from typing import Tuple
 from pyasn1.codec.der import decoder, encoder
 from pyasn1.type import namedtype, univ
 
-from Core.gmssl import SM2_DEFAULT_ID, SM2_MAX_SIGNATURE_SIZE, Sm2Signature
-from easy_sm2_key import EasySm2Key
+from .gmssl import SM2_DEFAULT_ID, SM2_MAX_SIGNATURE_SIZE, Sm2Signature
+from .easy_sm2_key import EasySm2Key
 
 
 # 定义 SM2 签名 ASN.1 结构
