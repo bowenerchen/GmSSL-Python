@@ -36,7 +36,7 @@ pip install easy_gmssl
 ## 四、使用示例
 
 1. **SM2密钥加解密**
-    - 输出多种模式下的密文：
+   - 输出多种模式下的密文：
    ```python
    from __future__ import annotations
    
@@ -50,6 +50,7 @@ pip install easy_gmssl
    for mode in SM2CipherMode:
        print(mode, '密文 in Hex:', enc.Encrypt('hello,world'.encode('utf-8'), mode, SM2CipherFormat.HexStr))
    ```
+
 2. **SM2公钥、私钥读取**
    ```python
    from __future__ import annotations
@@ -60,8 +61,9 @@ pip install easy_gmssl
    print('公钥数据 In Hex:', test.get_sm2_public_key_in_hex())
    print('私钥数据 In Hex:', test.get_sm2_private_key_in_hex())
    ```
+
 3. **SM2签名验签**
-   
+
    - 以RS_ASN1模式为例：
    ```python
    from __future__ import annotations
@@ -93,8 +95,11 @@ pip install easy_gmssl
    # 验证签名时同样指定签名值格式为 RS 模式
    ret = verify_test.VerifySignature(sign_value, signature_mode = SignatureMode.RS)
    ```
-   
+
 4.   **SM4-CBC对称加解密**
+
+    
+
     ```python
     from __future__ import annotations
     
@@ -119,6 +124,9 @@ pip install easy_gmssl
     ```
 
 5.   **SM4-GCM对称加解密**
+
+    
+
     ```python
     from __future__ import annotations
     
@@ -151,6 +159,9 @@ pip install easy_gmssl
     ```
 
 6.   **SM3哈希与HMAC计算**
+
+    
+
     ```python
     from __future__ import annotations
     
@@ -182,6 +193,9 @@ pip install easy_gmssl
     ```
 
 7.   **随机字节流与随机字符串**
+
+    
+
     ```python
     
     from __future__ import annotations
@@ -200,36 +214,39 @@ pip install easy_gmssl
     ```
 
 8.   **ZUC加解密**
-     ```python
-     
-     from __future__ import annotations
-     
-     from easy_gmssl import EasyRandomData, EasyZuc
-     from easy_gmssl.gmssl import ZUC_IV_SIZE, ZUC_KEY_SIZE
-     
-     
-     key = EasyRandomData().GetRandomData(ZUC_KEY_SIZE)
-     iv = EasyRandomData().GetRandomData(ZUC_IV_SIZE)
-     
-     test = EasyZuc(key, iv)
-     plain1 = 'hello,world'.encode('utf-8')
-     cipher1 = test.Update(plain1)
-     plain2 = '1234567890'.encode('utf-8')
-     cipher2 = test.Update(plain2)
-     cipher3 = test.Finish()
-     
-     
-     test2 = EasyZuc(key, iv)
-     ret1 = test2.Update(cipher1)
-     ret2 = test2.Update(cipher2)
-     ret3 = test2.Update(cipher3)
-     ret4 = test2.Finish()
-     assert ret1 + ret2 + ret3 + ret4 == plain1 + plain2
-     print('解密成功：', ret1 + ret2 + ret3 + ret4 == plain1 + plain2)
-     
-     ```
-     
-     
+
+    
+
+    ```python
+    
+    from __future__ import annotations
+    
+    from easy_gmssl import EasyRandomData, EasyZuc
+    from easy_gmssl.gmssl import ZUC_IV_SIZE, ZUC_KEY_SIZE
+    
+    
+    key = EasyRandomData().GetRandomData(ZUC_KEY_SIZE)
+    iv = EasyRandomData().GetRandomData(ZUC_IV_SIZE)
+    
+    test = EasyZuc(key, iv)
+    plain1 = 'hello,world'.encode('utf-8')
+    cipher1 = test.Update(plain1)
+    plain2 = '1234567890'.encode('utf-8')
+    cipher2 = test.Update(plain2)
+    cipher3 = test.Finish()
+    
+    
+    test2 = EasyZuc(key, iv)
+    ret1 = test2.Update(cipher1)
+    ret2 = test2.Update(cipher2)
+    ret3 = test2.Update(cipher3)
+    ret4 = test2.Finish()
+    assert ret1 + ret2 + ret3 + ret4 == plain1 + plain2
+    print('解密成功：', ret1 + ret2 + ret3 + ret4 == plain1 + plain2)
+    
+    ```
+
+    
 
 ## 五、注意事项
 
