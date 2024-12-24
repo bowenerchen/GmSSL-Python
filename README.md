@@ -95,7 +95,7 @@ pip install easy_gmssl
    ```
    
 4.   **SM4-CBC对称加解密**
-
+    
     ```python
     from __future__ import annotations
     
@@ -104,15 +104,14 @@ pip install easy_gmssl
     
     key = 'x' * SM4_BLOCK_SIZE
     iv = 'y' * SM4_CBC_IV_SIZE
-    # 加密操作
+    
     test_cbc_enc = EasySm4CBC(key.encode('utf-8'), iv.encode('utf-8'), True)
     plain1 = 'hello,world'
     plain2 = '1234567890'
     cipher1 = test_cbc_enc.Update(plain1.encode('utf-8'))
     cipher2 = test_cbc_enc.Update(plain2.encode('utf-8'))
     ciphers = cipher1 + cipher2 + test_cbc_enc.Finish()
-    
-    # 解密操作
+
     test_dec = EasySm4CBC(key.encode('utf-8'), iv.encode('utf-8'), False)
     decrypted_plain1 = test_dec.Update(ciphers)
     decrypted_plain = decrypted_plain1 + test_dec.Finish()
@@ -131,22 +130,21 @@ pip install easy_gmssl
     
     key = 'x' * SM4_BLOCK_SIZE
     iv = 'y' * SM4_CBC_IV_SIZE
-    # 定义拓展验证数据，加解密时此数据需要保持一致
+    
     aad = 'a' * (SM4_BLOCK_SIZE + SM4_CBC_IV_SIZE)
-    # 定义tag长度，最小 8 个字节
+    
     tag_len = int(SM4_GCM_DEFAULT_TAG_SIZE / 2)
     test_gcm_enc = EasySm4GCM(key.encode('utf-8'), iv.encode('utf-8'), aad, tag_len, True)
     plain1 = 'hello,world'
     plain2 = '1234567890'
-    # 进行加密操作
+    
     cipher1 = test_gcm_enc.Update(plain1.encode('utf-8'))
     cipher2 = test_gcm_enc.Update(plain2.encode('utf-8'))
     ciphers = cipher1 + cipher2 + test_gcm_enc.Finish()
-    # GCM模式下的密文长度与明文长度等长
-    # 返回的密文中包含了 tag 长度
+
     print('ciphers len:', len(ciphers), 'tag_len=', tag_len, 'plain len:', len(plain1 + plain2))
     
-    # 进行解密操作，此时aad和tag_len需要与加密时保持一致
+    
     test_dec = EasySm4GCM(key.encode('utf-8'), iv.encode('utf-8'), aad, tag_len, False)
     decrypted_plain1 = test_dec.Update(ciphers)
     decrypted_plain = decrypted_plain1 + test_dec.Finish()
@@ -155,7 +153,7 @@ pip install easy_gmssl
     ```
 
 6.   **SM3哈希与HMAC计算**
-
+    
     ```python
     from __future__ import annotations
     
@@ -165,7 +163,7 @@ pip install easy_gmssl
     from easy_gmssl.gmssl import SM3_HMAC_MAX_KEY_SIZE
     
     test = EasySM3Digest()
-    # 计算哈希
+
     plain1 = 'hello,world'.encode('utf-8')
     plain2 = '1234567890'.encode('utf-8')
     plain3 = (plain1 + plain2)
@@ -175,7 +173,7 @@ pip install easy_gmssl
     print('hash value:', hash_value_2.hex())
     print('hash value length in bytes:', hash_len)
     
-    # 计算HMAC
+
     plain = 'hello,world'.encode('utf-8')
     print('plain hex:', plain.hex())
     key = bytes([random.randint(0, 255) for _ in range(0, SM3_HMAC_MAX_KEY_SIZE)])
@@ -189,32 +187,34 @@ pip install easy_gmssl
 7.   **随机字节流与随机字符串**
 
     ```python
+
     from __future__ import annotations
     
     from easy_gmssl import EasyRandomData, RandomMode
     
-    # 生成随机字节流
+
     test = EasyRandomData()
     ret = test.GetRandomData(20)
     print(ret.hex())
-    # 生成随机字符串
+
     test = EasyRandomData(mode = RandomMode.RandomStr)
     ret = test.GetRandomData(64)
     print(ret)
+
     ```
 
 8.   **ZUC加解密**
-
      ```python
+     
      from __future__ import annotations
      
      from easy_gmssl import EasyRandomData, EasyZuc
      from easy_gmssl.gmssl import ZUC_IV_SIZE, ZUC_KEY_SIZE
      
-     # 生成密钥与 IV
+
      key = EasyRandomData().GetRandomData(ZUC_KEY_SIZE)
      iv = EasyRandomData().GetRandomData(ZUC_IV_SIZE)
-     # 加密操作
+
      test = EasyZuc(key, iv)
      plain1 = 'hello,world'.encode('utf-8')
      cipher1 = test.Update(plain1)
@@ -222,7 +222,7 @@ pip install easy_gmssl
      cipher2 = test.Update(plain2)
      cipher3 = test.Finish()
      
-     # 解密操作
+
      test2 = EasyZuc(key, iv)
      ret1 = test2.Update(cipher1)
      ret2 = test2.Update(cipher2)
@@ -230,6 +230,7 @@ pip install easy_gmssl
      ret4 = test2.Finish()
      assert ret1 + ret2 + ret3 + ret4 == plain1 + plain2
      print('解密成功：', ret1 + ret2 + ret3 + ret4 == plain1 + plain2)
+     
      ```
      
      
