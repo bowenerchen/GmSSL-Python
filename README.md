@@ -110,7 +110,7 @@ pip install easy_gmssl
     cipher1 = test_cbc_enc.Update(plain1.encode('utf-8'))
     cipher2 = test_cbc_enc.Update(plain2.encode('utf-8'))
     ciphers = cipher1 + cipher2 + test_cbc_enc.Finish()
-
+    
     test_dec = EasySm4CBC(key.encode('utf-8'), iv.encode('utf-8'), False)
     decrypted_plain1 = test_dec.Update(ciphers)
     decrypted_plain = decrypted_plain1 + test_dec.Finish()
@@ -139,7 +139,7 @@ pip install easy_gmssl
     cipher1 = test_gcm_enc.Update(plain1.encode('utf-8'))
     cipher2 = test_gcm_enc.Update(plain2.encode('utf-8'))
     ciphers = cipher1 + cipher2 + test_gcm_enc.Finish()
-
+    
     print('ciphers len:', len(ciphers), 'tag_len=', tag_len, 'plain len:', len(plain1 + plain2))
     
     
@@ -160,7 +160,7 @@ pip install easy_gmssl
     from easy_gmssl.gmssl import SM3_HMAC_MAX_KEY_SIZE
     
     test = EasySM3Digest()
-
+    
     plain1 = 'hello,world'.encode('utf-8')
     plain2 = '1234567890'.encode('utf-8')
     plain3 = (plain1 + plain2)
@@ -170,7 +170,7 @@ pip install easy_gmssl
     print('hash value:', hash_value_2.hex())
     print('hash value length in bytes:', hash_len)
     
-
+    
     plain = 'hello,world'.encode('utf-8')
     print('plain hex:', plain.hex())
     key = bytes([random.randint(0, 255) for _ in range(0, SM3_HMAC_MAX_KEY_SIZE)])
@@ -183,20 +183,20 @@ pip install easy_gmssl
 
 7.   **随机字节流与随机字符串**
     ```python
-
+    
     from __future__ import annotations
     
     from easy_gmssl import EasyRandomData, RandomMode
     
-
+    
     test = EasyRandomData()
     ret = test.GetRandomData(20)
     print(ret.hex())
-
+    
     test = EasyRandomData(mode = RandomMode.RandomStr)
     ret = test.GetRandomData(64)
     print(ret)
-
+    
     ```
 
 8.   **ZUC加解密**
@@ -207,10 +207,10 @@ pip install easy_gmssl
      from easy_gmssl import EasyRandomData, EasyZuc
      from easy_gmssl.gmssl import ZUC_IV_SIZE, ZUC_KEY_SIZE
      
-
+     
      key = EasyRandomData().GetRandomData(ZUC_KEY_SIZE)
      iv = EasyRandomData().GetRandomData(ZUC_IV_SIZE)
-
+     
      test = EasyZuc(key, iv)
      plain1 = 'hello,world'.encode('utf-8')
      cipher1 = test.Update(plain1)
@@ -218,7 +218,7 @@ pip install easy_gmssl
      cipher2 = test.Update(plain2)
      cipher3 = test.Finish()
      
-
+     
      test2 = EasyZuc(key, iv)
      ret1 = test2.Update(cipher1)
      ret2 = test2.Update(cipher2)
