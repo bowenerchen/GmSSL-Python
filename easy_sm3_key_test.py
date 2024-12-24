@@ -1,8 +1,9 @@
 import random
 import unittest
 
+from easy_gmssl.easy_sm3_key import EasySM3Digest, EasySM3Hmac
+
 from gmssl import SM3_DIGEST_SIZE, SM3_HMAC_MAX_KEY_SIZE, SM3_HMAC_MIN_KEY_SIZE, SM3_HMAC_SIZE
-from easy_sm3_key import EasySM3Digest, EasySM3Hmac
 
 
 class MyTestCase(unittest.TestCase):

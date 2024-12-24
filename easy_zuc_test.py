@@ -1,8 +1,9 @@
 import unittest
 
-from gmssl import ZUC_IV_SIZE, ZUC_KEY_SIZE
+from easy_gmssl.easy_zuc import EasyZuc
+
 from easy_random_data import EasyRandomData
-from easy_zuc import EasyZuc
+from gmssl import ZUC_IV_SIZE, ZUC_KEY_SIZE
 
 
 class MyTestCase(unittest.TestCase):

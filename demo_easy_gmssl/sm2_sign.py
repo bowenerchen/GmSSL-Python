@@ -11,7 +11,7 @@ from easy_gmssl import EasySM2SignKey, EasySM2VerifyKey, SignatureMode
 signer_id = 'test_signer'
 print('signer_id hex:', signer_id.encode('utf-8').hex())
 # 初始化用于签名验签的 SM2 密钥，此时不需要关心签名值的模式
-test = EasySM2SignKey(signer_id = signer_id, pem_private_key_file = './test_keys/tmp_test_sm2_private.pem',
+test = EasySM2SignKey(signer_id = signer_id, pem_private_key_file = '../test_keys/tmp_test_sm2_private.pem',
                       password = '123456')
 plain = bytes([random.randint(0, 255) for _ in range(0, 64)])
 print('plain hex:', plain.hex())
@@ -25,7 +25,7 @@ sign_value = test.GetSignValue(signature_mode = SignatureMode.RS)
 print('signature hex:', sign_value.hex())
 
 # 初始化用于验证签名的 SM2 密钥
-verify_test = EasySM2VerifyKey(signer_id = signer_id, pem_public_key_file = './test_keys/tmp_test_sm2_public.pem')
+verify_test = EasySM2VerifyKey(signer_id = signer_id, pem_public_key_file = '../test_keys/tmp_test_sm2_public.pem')
 # 验证签名
 verify_test.UpdateData(plain)
 # 验证签名时同样指定签名值格式为 RS 模式

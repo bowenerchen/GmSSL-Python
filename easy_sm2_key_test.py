@@ -2,8 +2,9 @@ import base64
 import random
 import unittest
 
+from easy_gmssl.easy_sm2_key import EasySm2EncryptionKey, EasySm2Key, SM2CipherFormat, SM2CipherMode
+
 from gmssl import SM2_MAX_CIPHERTEXT_SIZE, SM2_MAX_PLAINTEXT_SIZE
-from easy_sm2_key import EasySm2EncryptionKey, EasySm2Key, SM2CipherFormat, SM2CipherMode
 
 
 class SM2KeyCase(unittest.TestCase):
