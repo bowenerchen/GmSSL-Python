@@ -4,6 +4,8 @@
 
 EasyGmSSL  FORK 自<u>**北京大学 GUNAZHI 老师团队的开源国密算法库**</u>： [GmSSL](https://github.com/guanzhi/GmSSL)，EasyGmSSL旨在为开发者提供一套接口更加友好的国密算法应用开发工具。它涵盖了SM2、SM3、SM4等国密算法的核心功能，并针对实际使用场景中的痛点进行了针对性改进。
 
+此 SDK 的 git 地址为：https://github.com/bowenerchen/GmSSL-Python
+
 ## 二、特色功能
 
 1. **便捷安装**
@@ -96,157 +98,77 @@ pip install easy_gmssl
    ret = verify_test.VerifySignature(sign_value, signature_mode = SignatureMode.RS)
    ```
 
-4.   **SM4-CBC对称加解密**
+4.   **SM4对称加解密示例**
 
-    
+     ```python
+     from __future__ import annotations
+     
+     from easy_gmssl import EasySm4CBC
+     from gmssl import SM4_BLOCK_SIZE, SM4_CBC_IV_SIZE
+     
+     key = 'x' * SM4_BLOCK_SIZE
+     iv = 'y' * SM4_CBC_IV_SIZE
+     
+     test_cbc_enc = EasySm4CBC(key.encode('utf-8'), iv.encode('utf-8'), True)
+     plain1 = 'hello,world'
+     plain2 = '1234567890'
+     cipher1 = test_cbc_enc.Update(plain1.encode('utf-8'))
+     cipher2 = test_cbc_enc.Update(plain2.encode('utf-8'))
+     ciphers = cipher1 + cipher2 + test_cbc_enc.Finish()
+     
+     test_dec = EasySm4CBC(key.encode('utf-8'), iv.encode('utf-8'), False)
+     decrypted_plain1 = test_dec.Update(ciphers)
+     decrypted_plain = decrypted_plain1 + test_dec.Finish()
+     
+     print('解密成功：', decrypted_plain == (plain1 + plain2).encode('utf-8'))
+     ```
 
-    ```python
-    from __future__ import annotations
-    
-    from easy_gmssl import EasySm4CBC
-    from gmssl import SM4_BLOCK_SIZE, SM4_CBC_IV_SIZE
-    
-    key = 'x' * SM4_BLOCK_SIZE
-    iv = 'y' * SM4_CBC_IV_SIZE
-    
-    test_cbc_enc = EasySm4CBC(key.encode('utf-8'), iv.encode('utf-8'), True)
-    plain1 = 'hello,world'
-    plain2 = '1234567890'
-    cipher1 = test_cbc_enc.Update(plain1.encode('utf-8'))
-    cipher2 = test_cbc_enc.Update(plain2.encode('utf-8'))
-    ciphers = cipher1 + cipher2 + test_cbc_enc.Finish()
-    
-    test_dec = EasySm4CBC(key.encode('utf-8'), iv.encode('utf-8'), False)
-    decrypted_plain1 = test_dec.Update(ciphers)
-    decrypted_plain = decrypted_plain1 + test_dec.Finish()
-    
-    print('解密成功：', decrypted_plain == (plain1 + plain2).encode('utf-8'))
-    ```
+5.   **ZUC加解密示例**
 
-5.   **SM4-GCM对称加解密**
+     ```python
+     from __future__ import annotations
+     
+     import random
+     
+     from easy_gmssl import EasySM3Digest, EasySM3Hmac
+     from easy_gmssl.gmssl import SM3_HMAC_MAX_KEY_SIZE
+     
+     test = EasySM3Digest()
+     
+     plain1 = 'hello,world'.encode('utf-8')
+     plain2 = '1234567890'.encode('utf-8')
+     plain3 = (plain1 + plain2)
+     print('plain hex:', plain3.hex())
+     test.UpdateData(plain3)
+     hash_value_2, hash_len, length2 = test.GetHash()
+     print('hash value:', hash_value_2.hex())
+     print('hash value length in bytes:', hash_len)
+     
+     
+     plain = 'hello,world'.encode('utf-8')
+     print('plain hex:', plain.hex())
+     key = bytes([random.randint(0, 255) for _ in range(0, SM3_HMAC_MAX_KEY_SIZE)])
+     print('key hex:', key.hex())
+     test = EasySM3Hmac(key)
+     test.UpdateData(plain)
+     hmac_hex, hmac_len, plain_len = test.GetHmac()
+     print('hmac value:', hmac_hex.hex(), 'hmac len:', hmac_len, 'plain len:', plain_len)
+     ```
 
-    
+6.   **随机数生成示例**
 
-    ```python
-    from __future__ import annotations
-    
-    from easy_gmssl import EasySm4GCM
-    from easy_gmssl.gmssl import SM4_BLOCK_SIZE, SM4_CBC_IV_SIZE
-    from gmssl import SM4_GCM_DEFAULT_TAG_SIZE
-    
-    key = 'x' * SM4_BLOCK_SIZE
-    iv = 'y' * SM4_CBC_IV_SIZE
-    
-    aad = 'a' * (SM4_BLOCK_SIZE + SM4_CBC_IV_SIZE)
-    
-    tag_len = int(SM4_GCM_DEFAULT_TAG_SIZE / 2)
-    test_gcm_enc = EasySm4GCM(key.encode('utf-8'), iv.encode('utf-8'), aad, tag_len, True)
-    plain1 = 'hello,world'
-    plain2 = '1234567890'
-    
-    cipher1 = test_gcm_enc.Update(plain1.encode('utf-8'))
-    cipher2 = test_gcm_enc.Update(plain2.encode('utf-8'))
-    ciphers = cipher1 + cipher2 + test_gcm_enc.Finish()
-    
-    print('ciphers len:', len(ciphers), 'tag_len=', tag_len, 'plain len:', len(plain1 + plain2))
-    
-    
-    test_dec = EasySm4GCM(key.encode('utf-8'), iv.encode('utf-8'), aad, tag_len, False)
-    decrypted_plain1 = test_dec.Update(ciphers)
-    decrypted_plain = decrypted_plain1 + test_dec.Finish()
-    
-    print('解密成功：', decrypted_plain == (plain1 + plain2).encode('utf-8'))
-    ```
+     ```python
+     from __future__ import annotations
+     from easy_gmssl import EasyRandomData, RandomMode
+     test = EasyRandomData()
+     ret = test.GetRandomData(20)
+     print(ret.hex())
+     test = EasyRandomData(mode = RandomMode.RandomStr)
+     ret = test.GetRandomData(64)
+     print(ret)
+     ```
 
-6.   **SM3哈希与HMAC计算**
-
-    
-
-    ```python
-    from __future__ import annotations
-    
-    import random
-    
-    from easy_gmssl import EasySM3Digest, EasySM3Hmac
-    from easy_gmssl.gmssl import SM3_HMAC_MAX_KEY_SIZE
-    
-    test = EasySM3Digest()
-    
-    plain1 = 'hello,world'.encode('utf-8')
-    plain2 = '1234567890'.encode('utf-8')
-    plain3 = (plain1 + plain2)
-    print('plain hex:', plain3.hex())
-    test.UpdateData(plain3)
-    hash_value_2, hash_len, length2 = test.GetHash()
-    print('hash value:', hash_value_2.hex())
-    print('hash value length in bytes:', hash_len)
-    
-    
-    plain = 'hello,world'.encode('utf-8')
-    print('plain hex:', plain.hex())
-    key = bytes([random.randint(0, 255) for _ in range(0, SM3_HMAC_MAX_KEY_SIZE)])
-    print('key hex:', key.hex())
-    test = EasySM3Hmac(key)
-    test.UpdateData(plain)
-    hmac_hex, hmac_len, plain_len = test.GetHmac()
-    print('hmac value:', hmac_hex.hex(), 'hmac len:', hmac_len, 'plain len:', plain_len)
-    ```
-
-7.   **随机字节流与随机字符串**
-
-    
-
-    ```python
-    
-    from __future__ import annotations
-    
-    from easy_gmssl import EasyRandomData, RandomMode
-    
-    
-    test = EasyRandomData()
-    ret = test.GetRandomData(20)
-    print(ret.hex())
-    
-    test = EasyRandomData(mode = RandomMode.RandomStr)
-    ret = test.GetRandomData(64)
-    print(ret)
-    
-    ```
-
-8.   **ZUC加解密**
-
-    
-
-    ```python
-    
-    from __future__ import annotations
-    
-    from easy_gmssl import EasyRandomData, EasyZuc
-    from easy_gmssl.gmssl import ZUC_IV_SIZE, ZUC_KEY_SIZE
-    
-    
-    key = EasyRandomData().GetRandomData(ZUC_KEY_SIZE)
-    iv = EasyRandomData().GetRandomData(ZUC_IV_SIZE)
-    
-    test = EasyZuc(key, iv)
-    plain1 = 'hello,world'.encode('utf-8')
-    cipher1 = test.Update(plain1)
-    plain2 = '1234567890'.encode('utf-8')
-    cipher2 = test.Update(plain2)
-    cipher3 = test.Finish()
-    
-    
-    test2 = EasyZuc(key, iv)
-    ret1 = test2.Update(cipher1)
-    ret2 = test2.Update(cipher2)
-    ret3 = test2.Update(cipher3)
-    ret4 = test2.Finish()
-    assert ret1 + ret2 + ret3 + ret4 == plain1 + plain2
-    print('解密成功：', ret1 + ret2 + ret3 + ret4 == plain1 + plain2)
-    
-    ```
-
-    
+     
 
 ## 五、注意事项
 
