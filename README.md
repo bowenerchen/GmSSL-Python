@@ -104,7 +104,7 @@ pip install easy_gmssl
      from __future__ import annotations
      
      from easy_gmssl import EasySm4CBC
-     from gmssl import SM4_BLOCK_SIZE, SM4_CBC_IV_SIZE
+     from easy_gmssl.gmssl import SM4_BLOCK_SIZE, SM4_CBC_IV_SIZE
      
      key = 'x' * SM4_BLOCK_SIZE
      iv = 'y' * SM4_CBC_IV_SIZE
