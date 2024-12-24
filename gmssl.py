@@ -5,7 +5,7 @@
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
-# GmSSL-Python - Python binding of the GmSSL library with `ctypes`
+# easy_gmssl - Python binding of the GmSSL library with `ctypes`
 
 
 import datetime
