@@ -1,7 +1,7 @@
 import string
 import unittest
 
-from easy_random_data import EasyRandomData, RandomMode
+from .easy_random_data import EasyRandomData, RandomMode
 
 
 class MyTestCase(unittest.TestCase):

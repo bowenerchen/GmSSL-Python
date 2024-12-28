@@ -9,7 +9,7 @@ import string
 from enum import Enum
 from typing import Union
 
-import gmssl
+from .gmssl import rand_bytes
 
 
 class RandomMode(Enum):
@@ -24,7 +24,7 @@ class EasyRandomData(object):
         self._mode = mode
 
     def GetRandomData(self, length: int = 16) -> Union[bytes | str]:
-        r = gmssl.rand_bytes(length)
+        r = rand_bytes(length)
         if length < 1:
             raise ValueError('invalid random length, required greater than 0')
         if self._mode == RandomMode.RandomBytes:

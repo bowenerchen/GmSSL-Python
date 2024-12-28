@@ -1,16 +1,16 @@
 import random
 import unittest
 
-from easy_gmssl.easy_sm2_sign_key import EasySM2SignKey, EasySM2VerifyKey, SignatureMode
-
 from gmssl import SM2_MAX_SIGNATURE_SIZE
+from .easy_sm2_sign_key import EasySM2SignKey, EasySM2VerifyKey, SignatureMode
 
 
 class MyTestCase(unittest.TestCase):
     def test_sign_data(self):
         signer_id = 'test_signer'
         print('signer_id hex:', signer_id.encode('utf-8').hex())
-        test = EasySM2SignKey(signer_id = signer_id, pem_private_key_file = './test_keys/tmp_test_sm2_private.pem',
+
+        test = EasySM2SignKey(signer_id = signer_id, pem_private_key_file = './easy_gmssl/test_keys/tmp_test_sm2_private.pem',
                               password = '123456')
         plain = bytes([random.randint(0, 255) for _ in range(0, 64)])
         print('plain hex:', plain.hex())
@@ -22,7 +22,8 @@ class MyTestCase(unittest.TestCase):
         self.assertTrue(len(sign_value) <= SM2_MAX_SIGNATURE_SIZE)
         self.assertTrue(len(sign_value) >= 64)  # RS_ASN1 模式下的签名不小于 64 字节
 
-        verify_test = EasySM2VerifyKey(signer_id = signer_id, pem_public_key_file = './test_keys/tmp_test_sm2_public.pem')
+        verify_test = EasySM2VerifyKey(signer_id = signer_id,
+                                       pem_public_key_file = './easy_gmssl/test_keys/tmp_test_sm2_public.pem')
         print('verify public key:', verify_test.get_sm2_public_key_in_hex())
         verify_test.UpdateData(plain)
         ret = verify_test.VerifySignature(sign_value)
@@ -31,7 +32,7 @@ class MyTestCase(unittest.TestCase):
     def test_rs_sign_mode(self):
         signer_id = 'test_signer'
         print('signer_id hex:', signer_id.encode('utf-8').hex())
-        test = EasySM2SignKey(signer_id = signer_id, pem_private_key_file = './test_keys/tmp_test_sm2_private.pem',
+        test = EasySM2SignKey(signer_id = signer_id, pem_private_key_file = './easy_gmssl/test_keys/tmp_test_sm2_private.pem',
                               password = '123456')
         plain = bytes([random.randint(0, 255) for _ in range(0, 64)])
         print('plain hex:', plain.hex())
@@ -44,7 +45,8 @@ class MyTestCase(unittest.TestCase):
         self.assertTrue(len(sign_value) <= SM2_MAX_SIGNATURE_SIZE)
         self.assertTrue(len(sign_value) == 64)
 
-        verify_test = EasySM2VerifyKey(signer_id = signer_id, pem_public_key_file = './test_keys/tmp_test_sm2_public.pem')
+        verify_test = EasySM2VerifyKey(signer_id = signer_id,
+                                       pem_public_key_file = './easy_gmssl/test_keys/tmp_test_sm2_public.pem')
         print('verify public key:', verify_test.get_sm2_public_key_in_hex())
         verify_test.UpdateData(plain)
         ret = verify_test.VerifySignature(sign_value, signature_mode = SignatureMode.RS)
@@ -52,7 +54,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_invalid_sign_mode(self):
         signer_id = 'test_signer'
-        test = EasySM2SignKey(signer_id = signer_id, pem_private_key_file = './test_keys/tmp_test_sm2_private.pem',
+        test = EasySM2SignKey(signer_id = signer_id, pem_private_key_file = './easy_gmssl/test_keys/tmp_test_sm2_private.pem',
                               password = '123456')
         plain = bytes([random.randint(0, 255) for _ in range(0, 64)])
         try:
@@ -67,7 +69,8 @@ class MyTestCase(unittest.TestCase):
     def test_invalid_signature_size(self):
         signer_id = 'test_signer'
         plain = bytes([random.randint(0, 255) for _ in range(0, 64)])
-        verify_test = EasySM2VerifyKey(signer_id = signer_id, pem_public_key_file = './test_keys/tmp_test_sm2_public.pem')
+        verify_test = EasySM2VerifyKey(signer_id = signer_id,
+                                       pem_public_key_file = './easy_gmssl/test_keys/tmp_test_sm2_public.pem')
         print('verify public key:', verify_test.get_sm2_public_key_in_hex())
         verify_test.UpdateData(plain)
 
