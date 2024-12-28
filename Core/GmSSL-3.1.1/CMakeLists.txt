@@ -311,7 +311,7 @@ if (ENABLE_HTTP_TESTS)
 endif()
 
 # option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
-option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
 	message(STATUS "CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS")

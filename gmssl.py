@@ -19,7 +19,7 @@ try:
     if not home_directory.endswith('/'):
         home_directory += '/'
     ext_dir = home_directory + ".gmssl_3.1.1_install/"
-    gmssl = cdll.LoadLibrary(ext_dir + "lib/libgmssl.a")
+    gmssl = cdll.LoadLibrary(ext_dir + "lib/libgmssl.so.3.1")
 except Exception:
     try:
         gmssl = cdll.LoadLibrary(find_library("gmssl"))
